@@ -6,11 +6,14 @@ synthesizes in the main loop. See [SKILL.md](./SKILL.md) for the full process.
 
 | Channel | Reaches |
 |---|---|
+| wigolo cache | every page already fetched — cross-session, 0ms, free (probe first) |
+| wigolo web | general web — 18 engines fused + on-device rerank, local, keyless |
 | codex | local repo, git history, `gh` |
 | web-agent | blogs, forums, docs, non-X social |
-| anysearch | general web + full-page extract |
+| anysearch | general web + full-page extract (second source / fallback) |
 | grok x_search | X/Twitter (the only native-X channel) |
-| NotebookLM | YouTube, podcasts, PDFs, audio |
+| watch | video you need to *see* — real frames + transcript, local (short clips/demos) |
+| NotebookLM | long video/podcast/audio + PDFs — semantic Q&A |
 | browser | login-walled / heavy-JS pages |
 | Apify ⚠️paid | public Facebook/social scrapes — last resort, ~$5 credit |
 
@@ -43,6 +46,13 @@ grok login
 
 # codex  (repo / git / gh)
 npm i -g @openai/codex
+
+# wigolo  (local web engine + cross-session cache) — wires itself into the agents you name
+npx wigolo init --agents=claude-code,codex
+#   cache/models/browser engine live in ~/.wigolo/ (per machine, not git-synced)
+
+# watch  (video → frames + transcript) — needs ffmpeg + yt-dlp; optional Groq/OpenAI Whisper key
+#   the /watch skill auto-installs deps on first run (brew on macOS) and scaffolds ~/.config/watch/.env
 ```
 
 ### MCP channels (per machine — auth does not sync)
@@ -64,6 +74,8 @@ claude mcp add --transport http --scope user apify https://mcp.apify.com
 | global `~/.claude/CLAUDE.md` rule | via `setup-research-team.sh` | run once |
 | git hooks | via `setup-research-team.sh` | run once |
 | grok / codex CLI | ❌ | install + login |
+| wigolo engine + `~/.wigolo/` cache | ❌ | `npx wigolo init` per machine (cache is local, never syncs) |
+| watch (ffmpeg/yt-dlp + `~/.config/watch/.env`) | ❌ | first `/watch` run installs deps + scaffolds config |
 | MCP auth (Apify, …) | ❌ | add + authenticate |
 
 ## Updating
